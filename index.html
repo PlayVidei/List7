@@ -1,1041 +1,957 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery Videos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0b0f19;
-            color: #f3f4f6;
-            overflow-x: hidden;
-        }
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        .rotate-y-180 { transform: rotateY(180deg); }
-        .glass {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-card {
-            background: rgba(25, 33, 53, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery Videos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #0b0f19;
+    color: #f3f4f6;
+    overflow-x: hidden;
+}
+
+.perspective-1000 { perspective: 1400px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 { transform: rotateY(180deg); }
+
+.glass {
+    background: rgba(17,24,39,.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.glass-card {
+    background: rgba(25,33,53,.6);
+    border: 1px solid rgba(255,255,255,.06);
+}
+
+.no-scrollbar::-webkit-scrollbar { display:none; }
+.no-scrollbar {
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+
+/* CONTAINER LEBAR */
+#cardContainer {
+    width: 100%;
+    max-width: 1200px;
+}
+
+#cardInner {
+    position: relative;
+    width: 100%;
+    min-height: 620px;
+    transition: transform .7s ease;
+    transform-style: preserve-3d;
+}
+
+.gallery-side {
+    min-height: 620px;
+}
+
+.player-side {
+    position: absolute;
+    inset: 0;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* PLAYER LEBAR */
+.player-frame {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-frame-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 100%;
+    background: #000;
+}
+
+.player-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* GRID */
+#videoGrid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+}
+
+@media(min-width:640px) {
+    #videoGrid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+}
+
+@media(min-width:900px) {
+    #videoGrid {
+        grid-template-columns: repeat(4, minmax(0,1fr));
+    }
+}
+
+@media(max-width:640px) {
+    #cardInner,
+    .gallery-side,
+    .player-side {
+        min-height: 580px;
+    }
+
+    #cardContainer {
+        max-width: 100%;
+    }
+
+    .player-side {
+        border-radius: 1.5rem;
+    }
+
+    .player-frame-inner {
+        aspect-ratio: 16 / 9;
+    }
+}
+</style>
 </head>
 
-<body class="min-h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
+<body class="min-h-screen flex flex-col">
 
-    <!-- HEADER -->
-    <header class="w-full py-6 px-4 text-center relative z-20">
-        <div class="inline-block relative">
-            <h1 class="text-6xl sm:text-7xl font-black uppercase tracking-widest text-transparent select-none opacity-40 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                style="-webkit-text-stroke: 2px #ec4899; z-index: 1;">
-                XXX
-            </h1>
+<!-- HEADER -->
+<header class="w-full py-6 px-4 text-center relative z-20">
+    <div class="inline-block relative">
+        <h1 class="text-6xl sm:text-7xl font-black uppercase tracking-widest text-transparent opacity-40 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            style="-webkit-text-stroke:2px #ec4899;z-index:1">
+            XXX
+        </h1>
 
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white relative"
-                style="z-index: 10; text-shadow: 0 4px 20px rgba(236,72,153,0.5);">
-                Gallery Videos
-            </h2>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white relative"
+            style="z-index:10;text-shadow:0 4px 20px rgba(236,72,153,.5)">
+            Gallery Videos
+        </h2>
+    </div>
+
+    <p class="text-xs sm:text-sm text-gray-400 mt-2">
+        Pilih video favorit Anda
+    </p>
+</header>
+
+<!-- MAIN -->
+<main class="flex-grow flex items-center justify-center px-3 sm:px-5 pb-12">
+
+<div id="cardContainer" class="perspective-1000 transition-transform duration-700">
+
+<div id="cardInner" class="transform-style-3d shadow-2xl rounded-3xl">
+
+<!-- GALERI -->
+<section class="gallery-side backface-hidden glass rounded-3xl p-4 sm:p-6 flex flex-col gap-5 shadow-xl">
+
+    <!-- SEARCH -->
+    <div class="relative flex items-center">
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Cari video atau artis..."
+            class="w-full bg-slate-900/80 border border-slate-700/60 rounded-2xl py-3 pl-4 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-pink-500">
+
+        <button
+            id="searchBtn"
+            class="absolute right-1.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white px-4 py-2 rounded-xl text-xs font-semibold">
+            Cari
+        </button>
+    </div>
+
+    <!-- KATEGORI -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+
+        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-pink-600 text-white shrink-0" data-cat="Semua">
+            Semua
+        </button>
+
+        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-gray-300 shrink-0" data-cat="Viral">
+            Viral
+        </button>
+
+        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-gray-300 shrink-0" data-cat="Janda">
+            Janda
+        </button>
+
+        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-gray-300 shrink-0" data-cat="Jilbab">
+            Jilbab
+        </button>
+    </div>
+
+    <!-- VIDEO GRID -->
+    <div id="videoGrid" class="grid grid-cols-2 gap-3 sm:gap-4"></div>
+
+    <!-- PAGINATION -->
+    <div id="paginationContainer" class="flex items-center justify-between pt-3 border-t border-slate-800 text-xs"></div>
+
+</section>
+
+<!-- PLAYER -->
+<section class="player-side backface-hidden rotate-y-180 glass rounded-3xl shadow-2xl bg-black">
+
+    <!-- PLAYER TOP BAR -->
+    <div class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+
+        <div class="bg-black/70 backdrop-blur-md px-3 py-2 rounded-full text-xs font-mono text-pink-400 border border-white/10 pointer-events-auto">
+            VIDARA PLAYER
         </div>
 
-        <p class="text-xs sm:text-sm text-gray-400 mt-2">
-            Pilih video favorit Anda
+        <button
+            id="backToGalleryBtn"
+            class="pointer-events-auto bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold border border-white/20">
+            ← Kembali ke Galeri
+        </button>
+
+    </div>
+
+    <!-- PLAYER FRAME -->
+    <div class="player-frame">
+
+        <div class="player-frame-inner">
+
+            <iframe
+                id="mainVideoPlayer"
+                src="about:blank"
+                title="Vidara Video Player"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin">
+            </iframe>
+
+        </div>
+
+    </div>
+
+    <!-- VIDEO TITLE -->
+    <div class="px-4 sm:px-6 py-4 bg-slate-950 border-t border-white/10">
+
+        <h3 id="playerVideoTitle" class="text-base sm:text-lg font-bold text-white">
+            Pilih video dari galeri
+        </h3>
+
+        <p class="text-xs text-gray-400 mt-1">
+            Pemutar video Vidara
         </p>
-    </header>
 
-    <!-- MAIN -->
-    <main class="flex-grow flex items-center justify-center px-4 pb-12">
-        <div id="cardContainer" class="w-full max-w-md perspective-1000 transition-transform duration-700">
+    </div>
 
-            <div id="cardInner" class="relative w-full transform-style-3d duration-700 shadow-2xl rounded-3xl">
+    <!-- IKLAN 1 -->
+    <div id="ad1" class="absolute top-16 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-white text-gray-900 p-3 rounded-2xl shadow-2xl hidden">
 
-                <!-- GALERI -->
-                <div class="backface-hidden glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+        <div class="flex items-start gap-3">
 
-                    <!-- SEARCH -->
-                    <div class="relative flex items-center">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="Cari video atau artis..."
-                            class="w-full bg-slate-900/80 border border-slate-700/60 rounded-2xl py-3 pl-4 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-all">
+            <img id="ad1Img" src="" class="w-10 h-10 rounded-full object-cover shrink-0" alt="Sponsor">
 
-                        <button
-                            id="searchBtn"
-                            class="absolute right-1.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-all">
-                            Cari
-                        </button>
-                    </div>
+            <div class="flex-grow">
 
-                    <!-- KATEGORI -->
-                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="categoryContainer">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-red-600">PESAN SPONSOR</span>
 
-                        <button class="cat-pill active-cat px-3.5 py-1.5 rounded-xl text-xs font-medium bg-pink-600 text-white shadow-md transition-all shrink-0" data-cat="Semua">
-                            Semua
-                        </button>
-
-                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-gray-300 transition-all shrink-0" data-cat="Viral">
-                            Viral
-                        </button>
-
-                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-gray-300 transition-all shrink-0" data-cat="Janda">
-                            Janda
-                        </button>
-
-                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-gray-300 transition-all shrink-0" data-cat="Jilbab">
-                            Jilbab
-                        </button>
-                    </div>
-
-                    <!-- GRID VIDEO -->
-                    <div id="videoGrid" class="grid grid-cols-2 gap-3.5"></div>
-
-                    <!-- PAGINATION -->
-                    <div id="paginationContainer" class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs"></div>
+                    <button onclick="triggerSmartlink();closeAd('ad1')" class="text-gray-500 text-xs font-bold">
+                        ✕
+                    </button>
                 </div>
 
-                <!-- VIDEO PLAYER -->
-                <div class="absolute inset-0 backface-hidden rotate-y-180 glass rounded-3xl overflow-hidden flex flex-col bg-black shadow-2xl">
+                <p id="ad1Text" class="text-xs font-semibold mt-1"></p>
 
-                    <!-- PLAYER HEADER -->
-                    <div class="absolute top-4 left-4 right-4 z-30 flex items-center justify-between pointer-events-none">
+                <button onclick="triggerSmartlink()" class="mt-2 w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 rounded-xl text-xs font-bold">
+                    💬 <span id="ad1BtnText">Tonton Sekarang</span>
+                </button>
 
-                        <div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono text-pink-400 border border-white/10 pointer-events-auto">
-                            VIDARA PLAYER
-                        </div>
-
-                        <button
-                            id="backToGalleryBtn"
-                            class="pointer-events-auto bg-black/70 hover:bg-black text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 backdrop-blur-md shadow-lg transition-all flex items-center gap-1.5">
-                            ← Galeri
-                        </button>
-                    </div>
-
-                    <!-- EMBED VIDARA -->
-                    <div class="w-full flex-grow bg-black flex flex-col min-h-0">
-
-                        <div class="relative w-full aspect-video bg-black">
-                            <iframe
-                                id="mainVideoPlayer"
-                                class="absolute inset-0 w-full h-full"
-                                src="about:blank"
-                                title="Vidara video player"
-                                frameborder="0"
-                                allow="autoplay; fullscreen; picture-in-picture"
-                                allowfullscreen
-                                loading="lazy"
-                                referrerpolicy="strict-origin-when-cross-origin">
-                            </iframe>
-                        </div>
-
-                        <!-- JUDUL PLAYER -->
-                        <div class="px-4 py-3 bg-slate-950/95 border-t border-white/10">
-                            <h3 id="playerVideoTitle" class="text-sm sm:text-base font-bold text-white leading-snug">
-                                Pilih video dari galeri
-                            </h3>
-
-                            <p class="text-[10px] text-gray-400 mt-1">
-                                Pemutar video Vidara
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- IKLAN 1 -->
-                    <div id="ad1" class="absolute top-16 left-4 right-4 z-40 bg-white text-gray-900 p-3 rounded-2xl shadow-2xl border border-gray-100 hidden transition-all animate-bounce">
-
-                        <div class="flex items-start gap-3">
-
-                            <img id="ad1Img" src="" class="w-10 h-10 rounded-full object-cover border border-pink-200 shrink-0" alt="Sponsor">
-
-                            <div class="flex-grow pr-4">
-
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-red-600 tracking-wider">
-                                        PESAN SPONSOR
-                                    </span>
-
-                                    <button onclick="triggerSmartlink(); closeAd('ad1');" class="text-gray-400 hover:text-gray-700 text-xs font-bold px-1">
-                                        ✕
-                                    </button>
-                                </div>
-
-                                <p id="ad1Text" class="text-xs font-semibold text-gray-800 mt-0.5"></p>
-
-                                <button onclick="triggerSmartlink()" class="mt-2 w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-1.5 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-1">
-                                    💬 <span id="ad1BtnText">Balas Pesan</span>
-                                </button>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- IKLAN 2 -->
-                    <div id="ad2" class="absolute top-1/2 -translate-y-1/2 right-3 z-40 w-36 h-52 bg-black rounded-2xl overflow-hidden shadow-2xl border-2 border-pink-500/50 hidden">
-
-                        <video
-                            id="ad2Video"
-                            class="w-full h-full object-cover cursor-pointer"
-                            onclick="triggerSmartlink()"
-                            autoplay muted loop playsinline>
-                        </video>
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-2 pointer-events-none">
-                            <span id="ad2Label" class="text-[9px] font-bold text-pink-300 leading-tight mb-1"></span>
-                        </div>
-
-                        <button onclick="triggerSmartlink(); closeAd('ad2');" class="absolute top-1.5 right-1.5 bg-black/70 hover:bg-black text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold">
-                            ✕
-                        </button>
-                    </div>
-
-                    <!-- IKLAN 3 -->
-                    <div id="ad3" class="absolute bottom-16 left-3 z-40 w-36 h-52 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border-2 border-purple-500/50 hidden">
-
-                        <img
-                            id="ad3Img"
-                            src=""
-                            class="w-full h-full object-cover cursor-pointer"
-                            onclick="triggerSmartlink()"
-                            alt="Ad 3">
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-2 pointer-events-none">
-                            <span id="ad3Label" class="text-[9px] font-bold text-yellow-300 leading-tight mb-1"></span>
-                        </div>
-
-                        <button onclick="triggerSmartlink(); closeAd('ad3');" class="absolute top-1.5 right-1.5 bg-black/70 hover:bg-black text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold">
-                            ✕
-                        </button>
-                    </div>
-
-                </div>
             </div>
         </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="w-full py-4 text-center text-xs text-gray-500 border-t border-slate-800/80">
-        &copy; 2026 Gallery Videos XXX. All rights reserved.
-    </footer>
-
-    <script>
-        // =====================================
-        // SMARTLINK
-        // =====================================
-
-        const smartlinks = [
-            "https://auctionr.org/4/24b55e3636d607271fdc76c2cd116ebe",
-            "https://apiguinee.org/4/f48d1b3a91d0b1fd3db51c3c384a044b"
-        ];
-
-        let smartlinkIndex = 0;
-
-        function triggerSmartlink() {
-            const url = smartlinks[smartlinkIndex];
-
-            smartlinkIndex = (smartlinkIndex + 1) % smartlinks.length;
-
-            window.open(url, "_blank", "noopener,noreferrer");
-        }
-
-
-        // =====================================
-        // DATABASE VIDEO VIDARA
-        // =====================================
-
-        const videosData = [
-
-            {
-                title: "Abg Viral",
-                embed: "https://vidara.to/e/ZAI5kQhMVjm32",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/k09s6BgqzI/ZAI5kQhMVjm32.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Begini Kalau Tante Sudah Kecintaan Dengan Berondongnya",
-                embed: "https://vidara.to/e/hHq6pBRXdHBrM",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/7lIV7BEEKK/hHq6pBRXdHBrM.jpg",
-                cat: "Janda",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Bersama pacar di rumah saat sepi",
-                embed: "https://vidara.to/e/65qbCS2Ov2q7F",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/6vwcfru6Nb/65qbCS2Ov2q7F.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Desahannya Lembut Cowoknya Beringas",
-                embed: "https://vidara.to/e/OrEGb9C2AmINf",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/6L4gDZ5sO1/OrEGb9C2AmINf.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Di spongin Wanita Cantik",
-                embed: "https://vidara.to/e/4D5g1MphzDEDG",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/yzYCvnKMEH/4D5g1MphzDEDG.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Di Wot Tante tobrut",
-                embed: "https://vidara.to/e/iJLkXj6lexf8o",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/oVhyGvh60P/iJLkXj6lexf8o.jpg",
-                cat: "Janda",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Dokter sange saat periksa pasien",
-                embed: "https://vidara.to/e/B0MnpahAhqH5S",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/keRvwwxxoo/B0MnpahAhqH5S.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Gadis cantik di hotel",
-                embed: "https://vidara.to/e/AqjpOFhh8zHVF",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/UgizI2tkAn/AqjpOFhh8zHVF.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Gadis Jepang Cantik",
-                embed: "https://vidara.to/e/mV90U6M8VbX8s",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/h4TVco1wyK/mV90U6M8VbX8s.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Goyangan gadis cantik",
-                embed: "https://vidara.to/e/7zVHBlnn5fcTb",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/LC4R1wx1xI/7zVHBlnn5fcTb.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Ngentot 2 Ronde gadis cantik 2 Kali Crot",
-                embed: "https://vidara.to/e/sqMhLtzuSXcru",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/WRoBX02U7Z/sqMhLtzuSXcru.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Punya Tante cantik minta dipuasin terus",
-                embed: "https://vidara.to/e/8XZuwxkorzjSk",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/i5F2er0Akd/8XZuwxkorzjSk.jpg",
-                cat: "Janda",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Tante Cantik Tobrut",
-                embed: "https://vidara.to/e/op0jGqLM9uiGO",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/jB0Enpha2V/op0jGqLM9uiGO.jpg",
-                cat: "Janda",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Tante hijab tobrut",
-                embed: "https://vidara.to/e/pvQWqpfZavlY6",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/rVfampBO0E/pvQWqpfZavlY6.jpg",
-                cat: "Jilbab",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Nina Lovi",
-                embed: "https://vidara.to/e/H9vk7nqT4dtMG",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/5klV6X6grB/H9vk7nqT4dtMG.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Piercedley",
-                embed: "https://vidara.to/e/fTTeJotQOQD5I",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/klA2hKdtC5/fTTeJotQOQD5I.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Santi gaya ngangkang di crot pacar di muka",
-                embed: "https://vidara.to/e/7h6sv3Viarn2e",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/CcBq1LKDVe/7h6sv3Viarn2e.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Skandal Livia bersama pacar",
-                embed: "https://vidara.to/e/qDmK7bcXrTlVt",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/HqD7cnlQMF/qDmK7bcXrTlVt.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Skandal pasangan dewasa",
-                embed: "https://vidara.to/e/buEucElYgxgRN",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/frqMVnJWer/buEucElYgxgRN.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            },
-
-            {
-                title: "Toket gede indo sange cantik putih",
-                embed: "https://vidara.to/e/nE1skW1jYdJP5",
-                gambar: "https://m996yefd.s1q2105.com/thumbnail/gFeoddoyBp/nE1skW1jYdJP5.jpg",
-                cat: "Viral",
-                durasi: "VIDARA"
-            }
-
-        ];
-
-
-        // =====================================
-        // DATA IKLAN 1
-        // =====================================
-
-        const ad1Data = [
-
-            {
-                img: "https://i.ibb.co.com/ZRwNg3v9/38763ffc7a76b3fd22e3af1827bf0518.jpg",
-                text: "Halo kak! Tonton video full versi tanpa sensor sekarang...",
-                btn: "Balas Pesan"
-            },
-
-            {
-                img: "https://i.ibb.co.com/7dpVVBv1/ea5decfe8cfe8f59cda1e6300eaf6a74.jpg",
-                text: "Jangan lewatkan video viral terbaru kualitas HD!",
-                btn: "Tonton Sekarang"
-            },
-
-            {
-                img: "https://i.ibb.co.com/N2W921ZS/d3f7c0b676a9dde5db9edaecd74f6c21.jpg",
-                text: "Gabung VIP member untuk akses tanpa batas!",
-                btn: "Gabung VIP"
-            }
-
-        ];
-
-
-        // =====================================
-        // DATA IKLAN 2
-        // =====================================
-
-        const ad2Data = [
-
-            {
-                video: "https://cdn.videy.co/y8d13TDz1.mp4",
-                label: "Video Viral Pilihan"
-            },
-
-            {
-                video: "https://cdn.videy.co/TNEvMz2i1.mp4",
-                label: "Hot Trending Video Full HD"
-            },
-
-            {
-                video: "https://cdn.videy.co/SGtmLRxe1.mp4",
-                label: "Koleksi Eksklusif Terbaru"
-            }
-
-        ];
-
-
-        // =====================================
-        // DATA IKLAN 3
-        // =====================================
-
-        const ad3Data = [
-
-            {
-                img: "https://i.ibb.co.com/HTJsbsd4/fcea5b3a19ccaf572bc272793f51ae80.jpg",
-                label: "Klik untuk melihat selengkapnya"
-            },
-
-            {
-                img: "https://i.ibb.co.com/mppcwLk/86196e3b8ff804c02b93a17e6e8be0e2.jpg",
-                label: "Spesial konten pilihan"
-            },
-
-            {
-                img: "https://i.ibb.co.com/B2Rmzpg6/HWf-M3xzb-YAAyk-EB.jpg",
-                label: "Update terbaru"
-            }
-
-        ];
-
-
-        // =====================================
-        // VARIABEL SISTEM IKLAN
-        // =====================================
-
-        let ad1Cycle = 0;
-        let ad2Cycle = 0;
-        let ad3Cycle = 0;
-
-        let ad1Timeout = null;
-        let ad2Timeout = null;
-        let ad3Timeout = null;
-
-        let ad1Closed = false;
-        let ad2Closed = false;
-        let ad3Closed = false;
-
-        let nextSessionTimeout = null;
-
-
-        // =====================================
-        // VARIABEL GALERI
-        // =====================================
-
-        let currentPage = 1;
-        const itemsPerPage = 6;
-
-        let currentCategory = "Semua";
-        let searchQuery = "";
-
-
-        const videoGrid = document.getElementById("videoGrid");
-        const paginationContainer = document.getElementById("paginationContainer");
-
-        const searchInput = document.getElementById("searchInput");
-        const searchBtn = document.getElementById("searchBtn");
-
-        const cardInner = document.getElementById("cardInner");
-
-        const mainVideoPlayer = document.getElementById("mainVideoPlayer");
-        const playerVideoTitle = document.getElementById("playerVideoTitle");
-
-        const backToGalleryBtn = document.getElementById("backToGalleryBtn");
-
-
-        // =====================================
-        // FILTER VIDEO
-        // =====================================
-
-        function getFilteredVideos() {
-
-            return videosData.filter(item => {
-
-                const matchCat =
-                    currentCategory === "Semua" ||
-                    item.cat === currentCategory;
-
-                const matchSearch =
-                    item.title.toLowerCase().includes(searchQuery.toLowerCase());
-
-                return matchCat && matchSearch;
-
-            });
-
-        }
-
-
-        // =====================================
-        // RENDER GALERI
-        // =====================================
-
-        function renderGallery() {
-
-            const filtered = getFilteredVideos();
-
-            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
-
-            if (currentPage > totalPages) {
-                currentPage = totalPages;
-            }
-
-            const start = (currentPage - 1) * itemsPerPage;
-
-            const paginatedItems = filtered.slice(
-                start,
-                start + itemsPerPage
-            );
-
-            videoGrid.innerHTML = "";
-
-            paginatedItems.forEach(item => {
-
-                const card = document.createElement("div");
-
-                card.className =
-                    "group relative aspect-[3/4] rounded-2xl overflow-hidden glass-card cursor-pointer shadow-lg hover:border-pink-500/50 transition-all duration-300";
-
-                card.innerHTML = `
-
-                    <img
-                        src="${item.gambar}"
-                        alt="${item.title}"
-                        loading="lazy"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-2.5">
-
-                        <span class="text-[10px] font-mono text-pink-400 font-semibold mb-0.5">
-                            ${item.durasi}
-                        </span>
-
-                        <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug">
-                            ${item.title}
-                        </h3>
-
-                    </div>
-                `;
-
-                card.addEventListener("click", () => {
-
-                    triggerSmartlink();
-
-                    openPlayer(item);
-
-                });
-
-                videoGrid.appendChild(card);
-
-            });
-
-
-            // PAGINATION
-
-            paginationContainer.innerHTML = `
-
-                <button
-                    onclick="changePage(${currentPage - 1})"
-                    ${currentPage === 1 ? "disabled" : ""}
-                    class="${currentPage === 1
-                        ? "text-gray-600 cursor-not-allowed px-2 py-1"
-                        : "text-gray-300 hover:text-white px-2 py-1 font-semibold"}">
-
-                    Prev
-
-                </button>
-
-                <span class="text-gray-400 font-medium">
-                    Hal ${currentPage} dari ${totalPages}
-                </span>
-
-                <button
-                    onclick="changePage(${currentPage + 1})"
-                    ${currentPage >= totalPages ? "disabled" : ""}
-                    class="${currentPage >= totalPages
-                        ? "text-gray-600 cursor-not-allowed px-2 py-1"
-                        : "text-gray-300 hover:text-white px-2 py-1 font-semibold"}">
-
-                    Next
-
-                </button>
-
-            `;
-
-        }
-
-
-        // =====================================
-        // GANTI HALAMAN
-        // =====================================
-
-        function changePage(page) {
-
-            const totalPages = Math.ceil(
-                getFilteredVideos().length / itemsPerPage
-            );
-
-            if (page >= 1 && page <= totalPages) {
-
-                currentPage = page;
-
-                renderGallery();
-
-            }
-
-        }
-
-
-        // =====================================
-        // FILTER KATEGORI
-        // =====================================
-
-        document.querySelectorAll(".cat-pill").forEach(btn => {
-
-            btn.addEventListener("click", (e) => {
-
-                document.querySelectorAll(".cat-pill").forEach(b => {
-
-                    b.classList.remove(
-                        "bg-pink-600",
-                        "text-white",
-                        "shadow-md"
-                    );
-
-                    b.classList.add(
-                        "bg-slate-800/80",
-                        "text-gray-300"
-                    );
-
-                });
-
-                e.currentTarget.classList.remove(
-                    "bg-slate-800/80",
-                    "text-gray-300"
-                );
-
-                e.currentTarget.classList.add(
-                    "bg-pink-600",
-                    "text-white",
-                    "shadow-md"
-                );
-
-                currentCategory = e.currentTarget.getAttribute("data-cat");
-
-                currentPage = 1;
-
-                renderGallery();
-
-            });
-
+    </div>
+
+    <!-- IKLAN 2 -->
+    <div id="ad2" class="absolute top-1/2 -translate-y-1/2 right-3 z-40 w-32 sm:w-40 h-44 sm:h-56 bg-black rounded-2xl overflow-hidden shadow-2xl border-2 border-pink-500/50 hidden">
+
+        <video
+            id="ad2Video"
+            class="w-full h-full object-cover cursor-pointer"
+            onclick="triggerSmartlink()"
+            autoplay muted loop playsinline>
+        </video>
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-2 pointer-events-none">
+            <span id="ad2Label" class="text-[9px] font-bold text-pink-300"></span>
+        </div>
+
+        <button onclick="triggerSmartlink();closeAd('ad2')" class="absolute top-1 right-1 bg-black/70 text-white w-6 h-6 rounded-full text-xs">
+            ✕
+        </button>
+
+    </div>
+
+    <!-- IKLAN 3 -->
+    <div id="ad3" class="absolute bottom-16 left-3 z-40 w-32 sm:w-40 h-44 sm:h-56 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border-2 border-purple-500/50 hidden">
+
+        <img
+            id="ad3Img"
+            src=""
+            class="w-full h-full object-cover cursor-pointer"
+            onclick="triggerSmartlink()"
+            alt="Sponsor">
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-2 pointer-events-none">
+            <span id="ad3Label" class="text-[9px] font-bold text-yellow-300"></span>
+        </div>
+
+        <button onclick="triggerSmartlink();closeAd('ad3')" class="absolute top-1 right-1 bg-black/70 text-white w-6 h-6 rounded-full text-xs">
+            ✕
+        </button>
+
+    </div>
+
+</section>
+
+</div>
+</div>
+</main>
+
+<!-- FOOTER -->
+<footer class="w-full py-4 text-center text-xs text-gray-500 border-t border-slate-800/80">
+    &copy; 2026 Gallery Videos XXX. All rights reserved.
+</footer>
+
+<script>
+// =====================================
+// SMARTLINK
+// =====================================
+
+const smartlinks = [
+    "https://auctionr.org/4/24b55e3636d607271fdc76c2cd116ebe",
+    "https://apiguinee.org/4/f48d1b3a91d0b1fd3db51c3c384a044b"
+];
+
+let smartlinkIndex = 0;
+
+function triggerSmartlink() {
+    const url = smartlinks[smartlinkIndex];
+    smartlinkIndex = (smartlinkIndex + 1) % smartlinks.length;
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+
+// =====================================
+// DATABASE VIDEO
+// =====================================
+
+const videosData = [
+
+{
+title:"Abg Viral",
+embed:"https://vidara.to/e/ZAI5kQhMVjm32",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/k09s6BgqzI/ZAI5kQhMVjm32.jpg",
+cat:"Viral"
+},
+
+{
+title:"Begini Kalau Tante Sudah Kecintaan Dengan Berondongnya",
+embed:"https://vidara.to/e/hHq6pBRXdHBrM",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/7lIV7BEEKK/hHq6pBRXdHBrM.jpg",
+cat:"Janda"
+},
+
+{
+title:"Bersama pacar di rumah saat sepi",
+embed:"https://vidara.to/e/65qbCS2Ov2q7F",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/6vwcfru6Nb/65qbCS2Ov2q7F.jpg",
+cat:"Viral"
+},
+
+{
+title:"Desahannya Lembut Cowoknya Beringas",
+embed:"https://vidara.to/e/OrEGb9C2AmINf",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/6L4gDZ5sO1/OrEGb9C2AmINf.jpg",
+cat:"Viral"
+},
+
+{
+title:"Di spongin Wanita Cantik",
+embed:"https://vidara.to/e/4D5g1MphzDEDG",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/yzYCvnKMEH/4D5g1MphzDEDG.jpg",
+cat:"Viral"
+},
+
+{
+title:"Di Wot Tante tobrut",
+embed:"https://vidara.to/e/iJLkXj6lexf8o",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/oVhyGvh60P/iJLkXj6lexf8o.jpg",
+cat:"Janda"
+},
+
+{
+title:"Dokter sange saat periksa pasien",
+embed:"https://vidara.to/e/B0MnpahAhqH5S",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/keRvwwxxoo/B0MnpahAhqH5S.jpg",
+cat:"Viral"
+},
+
+{
+title:"Gadis cantik di hotel",
+embed:"https://vidara.to/e/AqjpOFhh8zHVF",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/UgizI2tkAn/AqjpOFhh8zHVF.jpg",
+cat:"Viral"
+},
+
+{
+title:"Gadis Jepang Cantik",
+embed:"https://vidara.to/e/mV90U6M8VbX8s",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/h4TVco1wyK/mV90U6M8VbX8s.jpg",
+cat:"Viral"
+},
+
+{
+title:"Goyangan gadis cantik",
+embed:"https://vidara.to/e/7zVHBlnn5fcTb",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/LC4R1wx1xI/7zVHBlnn5fcTb.jpg",
+cat:"Viral"
+},
+
+{
+title:"Ngentot 2 Ronde gadis cantik 2 Kali Crot",
+embed:"https://vidara.to/e/sqMhLtzuSXcru",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/WRoBX02U7Z/sqMhLtzuSXcru.jpg",
+cat:"Viral"
+},
+
+{
+title:"Punya Tante cantik minta dipuasin terus",
+embed:"https://vidara.to/e/8XZuwxkorzjSk",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/i5F2er0Akd/8XZuwxkorzjSk.jpg",
+cat:"Janda"
+},
+
+{
+title:"Tante Cantik Tobrut",
+embed:"https://vidara.to/e/op0jGqLM9uiGO",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/jB0Enpha2V/op0jGqLM9uiGO.jpg",
+cat:"Janda"
+},
+
+{
+title:"Tante hijab tobrut",
+embed:"https://vidara.to/e/pvQWqpfZavlY6",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/rVfampBO0E/pvQWqpfZavlY6.jpg",
+cat:"Jilbab"
+},
+
+{
+title:"Nina Lovi",
+embed:"https://vidara.to/e/H9vk7nqT4dtMG",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/5klV6X6grB/H9vk7nqT4dtMG.jpg",
+cat:"Viral"
+},
+
+{
+title:"Piercedley",
+embed:"https://vidara.to/e/fTTeJotQOQD5I",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/klA2hKdtC5/fTTeJotQOQD5I.jpg",
+cat:"Viral"
+},
+
+{
+title:"Santi gaya ngangkang di crot pacar di muka",
+embed:"https://vidara.to/e/7h6sv3Viarn2e",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/CcBq1LKDVe/7h6sv3Viarn2e.jpg",
+cat:"Viral"
+},
+
+{
+title:"Skandal Livia bersama pacar",
+embed:"https://vidara.to/e/qDmK7bcXrTlVt",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/HqD7cnlQMF/qDmK7bcXrTlVt.jpg",
+cat:"Viral"
+},
+
+{
+title:"Skandal pasangan dewasa",
+embed:"https://vidara.to/e/buEucElYgxgRN",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/frqMVnJWer/buEucElYgxgRN.jpg",
+cat:"Viral"
+},
+
+{
+title:"Toket gede indo sange cantik putih",
+embed:"https://vidara.to/e/nE1skW1jYdJP5",
+gambar:"https://m996yefd.s1q2105.com/thumbnail/gFeoddoyBp/nE1skW1jYdJP5.jpg",
+cat:"Viral"
+}
+
+];
+
+
+// =====================================
+// DATA IKLAN
+// =====================================
+
+const ad1Data = [
+{
+img:"https://i.ibb.co.com/ZRwNg3v9/38763ffc7a76b3fd22e3af1827bf0518.jpg",
+text:"Halo kak! Tonton video pilihan sekarang...",
+btn:"Tonton Sekarang"
+},
+{
+img:"https://i.ibb.co.com/7dpVVBv1/ea5decfe8cfe8f59cda1e6300eaf6a74.jpg",
+text:"Jangan lewatkan video terbaru!",
+btn:"Lihat Sekarang"
+},
+{
+img:"https://i.ibb.co.com/N2W921ZS/d3f7c0b676a9dde5db9edaecd74f6c21.jpg",
+text:"Gabung member untuk akses koleksi.",
+btn:"Gabung VIP"
+}
+];
+
+const ad2Data = [
+{
+video:"https://cdn.videy.co/y8d13TDz1.mp4",
+label:"Video Pilihan"
+},
+{
+video:"https://cdn.videy.co/TNEvMz2i1.mp4",
+label:"Video Trending"
+},
+{
+video:"https://cdn.videy.co/SGtmLRxe1.mp4",
+label:"Koleksi Terbaru"
+}
+];
+
+const ad3Data = [
+{
+img:"https://i.ibb.co.com/HTJsbsd4/fcea5b3a19ccaf572bc272793f51ae80.jpg",
+label:"Lihat koleksi pilihan"
+},
+{
+img:"https://i.ibb.co.com/mppcwLk/86196e3b8ff804c02b93a17e6e8be0e2.jpg",
+label:"Konten pilihan"
+},
+{
+img:"https://i.ibb.co.com/B2Rmzpg6/HWf-M3xzb-YAAyk-EB.jpg",
+label:"Update terbaru"
+}
+];
+
+
+// =====================================
+// VARIABEL
+// =====================================
+
+let ad1Cycle=0, ad2Cycle=0, ad3Cycle=0;
+
+let ad1Timeout=null;
+let ad2Timeout=null;
+let ad3Timeout=null;
+let nextSessionTimeout=null;
+
+let ad1Closed=false;
+let ad2Closed=false;
+let ad3Closed=false;
+
+let currentPage=1;
+const itemsPerPage=6;
+
+let currentCategory="Semua";
+let searchQuery="";
+
+const videoGrid=document.getElementById("videoGrid");
+const paginationContainer=document.getElementById("paginationContainer");
+const searchInput=document.getElementById("searchInput");
+const cardInner=document.getElementById("cardInner");
+const mainVideoPlayer=document.getElementById("mainVideoPlayer");
+const playerVideoTitle=document.getElementById("playerVideoTitle");
+
+
+// =====================================
+// FILTER VIDEO
+// =====================================
+
+function getFilteredVideos() {
+    return videosData.filter(item => {
+        const matchCat =
+            currentCategory==="Semua" ||
+            item.cat===currentCategory;
+
+        const matchSearch =
+            item.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+        return matchCat && matchSearch;
+    });
+}
+
+
+// =====================================
+// RENDER GALERI
+// =====================================
+
+function renderGallery() {
+
+    const filtered=getFilteredVideos();
+
+    const totalPages=Math.ceil(filtered.length/itemsPerPage)||1;
+
+    if(currentPage>totalPages) currentPage=totalPages;
+
+    const start=(currentPage-1)*itemsPerPage;
+
+    const items=filtered.slice(start,start+itemsPerPage);
+
+    videoGrid.innerHTML="";
+
+    items.forEach(item => {
+
+        const card=document.createElement("div");
+
+        card.className="group relative aspect-[3/4] rounded-2xl overflow-hidden glass-card cursor-pointer shadow-lg hover:border-pink-500/50 transition-all";
+
+        const img=document.createElement("img");
+        img.src=item.gambar;
+        img.alt=item.title;
+        img.loading="lazy";
+        img.className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500";
+
+        img.onerror=()=> {
+            img.style.display="none";
+            card.style.background="#1e293b";
+        };
+
+        const overlay=document.createElement("div");
+        overlay.className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-3";
+
+        const category=document.createElement("span");
+        category.className="text-[10px] font-mono text-pink-400 font-semibold mb-1";
+        category.textContent=item.cat;
+
+        const title=document.createElement("h3");
+        title.className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug";
+        title.textContent=item.title;
+
+        overlay.append(category,title);
+        card.append(img,overlay);
+
+        card.addEventListener("click",()=>openPlayer(item));
+
+        videoGrid.appendChild(card);
+    });
+
+    paginationContainer.innerHTML=`
+        <button
+            onclick="changePage(${currentPage-1})"
+            ${currentPage===1?"disabled":""}
+            class="px-3 py-2 ${currentPage===1?"text-gray-600":"text-gray-300"}">
+            Prev
+        </button>
+
+        <span class="text-gray-400">
+            Hal ${currentPage} dari ${totalPages}
+        </span>
+
+        <button
+            onclick="changePage(${currentPage+1})"
+            ${currentPage>=totalPages?"disabled":""}
+            class="px-3 py-2 ${currentPage>=totalPages?"text-gray-600":"text-gray-300"}">
+            Next
+        </button>
+    `;
+}
+
+
+// =====================================
+// PAGINATION
+// =====================================
+
+function changePage(page) {
+
+    const totalPages=Math.ceil(getFilteredVideos().length/itemsPerPage);
+
+    if(page>=1 && page<=totalPages) {
+        currentPage=page;
+        renderGallery();
+    }
+}
+
+
+// =====================================
+// KATEGORI
+// =====================================
+
+document.querySelectorAll(".cat-pill").forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        document.querySelectorAll(".cat-pill").forEach(b=>{
+            b.classList.remove("bg-pink-600","text-white");
+            b.classList.add("bg-slate-800","text-gray-300");
         });
 
-
-        // =====================================
-        // PENCARIAN
-        // =====================================
-
-        searchBtn.addEventListener("click", () => {
-
-            searchQuery = searchInput.value.trim();
-
-            currentPage = 1;
-
-            renderGallery();
-
-        });
-
-
-        searchInput.addEventListener("input", () => {
-
-            searchQuery = searchInput.value.trim();
-
-            currentPage = 1;
-
-            renderGallery();
-
-        });
-
-
-        // =====================================
-        // BUKA VIDEO PLAYER VIDARA
-        // =====================================
-
-        function openPlayer(item) {
-
-            cardInner.classList.add("rotate-y-180");
-
-            mainVideoPlayer.src = item.embed;
-
-            mainVideoPlayer.title = item.title;
-
-            playerVideoTitle.textContent = item.title;
-
-            resetAds();
-
-            startAdSequence();
-
-        }
-
-
-        // =====================================
-        // KEMBALI KE GALERI
-        // =====================================
-
-        backToGalleryBtn.addEventListener("click", () => {
-
-            cardInner.classList.remove("rotate-y-180");
-
-            mainVideoPlayer.src = "about:blank";
-
-            playerVideoTitle.textContent = "Pilih video dari galeri";
-
-            clearAllAdTimeouts();
-
-            hideAllAds();
-
-        });
-
-
-        // =====================================
-        // MULAI SIKLUS IKLAN
-        // =====================================
-
-        function startAdSequence() {
-
-            clearAllAdTimeouts();
-
-            ad1Closed = false;
-            ad2Closed = false;
-            ad3Closed = false;
-
-
-            // Iklan 1: 10 detik
-
-            ad1Timeout = setTimeout(() => {
-
-                showAd1();
-
-            }, 10000);
-
-
-            // Iklan 3: 11 detik
-
-            ad3Timeout = setTimeout(() => {
-
-                showAd3();
-
-            }, 11000);
-
-
-            // Iklan 2: 11,5 detik
-
-            ad2Timeout = setTimeout(() => {
-
-                showAd2();
-
-            }, 11500);
-
-        }
-
-
-        // =====================================
-        // TAMPILKAN IKLAN 1
-        // =====================================
-
-        function showAd1() {
-
-            if (ad1Cycle >= ad1Data.length) return;
-
-            const currentAd = ad1Data[ad1Cycle];
-
-            document.getElementById("ad1Img").src = currentAd.img;
-
-            document.getElementById("ad1Text").innerText = currentAd.text;
-
-            document.getElementById("ad1BtnText").innerText = currentAd.btn;
-
-            document.getElementById("ad1").classList.remove("hidden");
-
-            ad1Closed = false;
-
-        }
-
-
-        // =====================================
-        // TAMPILKAN IKLAN 2
-        // =====================================
-
-        function showAd2() {
-
-            if (ad2Cycle >= ad2Data.length) return;
-
-            const currentAd = ad2Data[ad2Cycle];
-
-            const video = document.getElementById("ad2Video");
-
-            video.src = currentAd.video;
-
-            video.load();
-
-            video.play().catch(() => {});
-
-            document.getElementById("ad2Label").innerText = currentAd.label;
-
-            document.getElementById("ad2").classList.remove("hidden");
-
-            ad2Closed = false;
-
-        }
-
-
-        // =====================================
-        // TAMPILKAN IKLAN 3
-        // =====================================
-
-        function showAd3() {
-
-            if (ad3Cycle >= ad3Data.length) return;
-
-            const currentAd = ad3Data[ad3Cycle];
-
-            document.getElementById("ad3Img").src = currentAd.img;
-
-            document.getElementById("ad3Label").innerText = currentAd.label;
-
-            document.getElementById("ad3").classList.remove("hidden");
-
-            ad3Closed = false;
-
-        }
-
-
-        // =====================================
-        // TUTUP IKLAN
-        // =====================================
-
-        function closeAd(adId) {
-
-            document.getElementById(adId).classList.add("hidden");
-
-
-            if (adId === "ad2") {
-
-                const video = document.getElementById("ad2Video");
-
-                video.pause();
-
-                video.removeAttribute("src");
-
-                video.load();
-
-            }
-
-
-            if (adId === "ad1") ad1Closed = true;
-
-            if (adId === "ad2") ad2Closed = true;
-
-            if (adId === "ad3") ad3Closed = true;
-
-
-            // Jika semua iklan sudah ditutup,
-            // sesi berikutnya dimulai setelah 1 menit.
-
-            if (ad1Closed && ad2Closed && ad3Closed) {
-
-                if (ad1Cycle < ad1Data.length - 1) {
-
-                    clearTimeout(nextSessionTimeout);
-
-                    nextSessionTimeout = setTimeout(() => {
-
-                        if (cardInner.classList.contains("rotate-y-180")) {
-
-                            ad1Cycle++;
-                            ad2Cycle++;
-                            ad3Cycle++;
-
-                            startAdSequence();
-
-                        }
-
-                    }, 60000);
-
-                }
-
-            }
-
-        }
-
-
-        // =====================================
-        // RESET IKLAN
-        // =====================================
-
-        function resetAds() {
-
-            hideAllAds();
-
-            ad1Cycle = 0;
-            ad2Cycle = 0;
-            ad3Cycle = 0;
-
-            ad1Closed = false;
-            ad2Closed = false;
-            ad3Closed = false;
-
-            clearTimeout(nextSessionTimeout);
-
-        }
-
-
-        // =====================================
-        // SEMBUNYIKAN SEMUA IKLAN
-        // =====================================
-
-        function hideAllAds() {
-
-            document.getElementById("ad1").classList.add("hidden");
-
-            document.getElementById("ad2").classList.add("hidden");
-
-            document.getElementById("ad3").classList.add("hidden");
-
-            const video = document.getElementById("ad2Video");
-
-            video.pause();
-
-            video.removeAttribute("src");
-
-            video.load();
-
-        }
-
-
-        // =====================================
-        // HAPUS SEMUA TIMER IKLAN
-        // =====================================
-
-        function clearAllAdTimeouts() {
-
-            clearTimeout(ad1Timeout);
-
-            clearTimeout(ad2Timeout);
-
-            clearTimeout(ad3Timeout);
-
-            clearTimeout(nextSessionTimeout);
-
-        }
-
-
-        // =====================================
-        // JALANKAN GALERI
-        // =====================================
+        btn.classList.remove("bg-slate-800","text-gray-300");
+        btn.classList.add("bg-pink-600","text-white");
+
+        currentCategory=btn.dataset.cat;
+        currentPage=1;
 
         renderGallery();
+    });
+});
 
-    </script>
 
+// =====================================
+// PENCARIAN
+// =====================================
+
+document.getElementById("searchBtn").addEventListener("click",()=>{
+    searchQuery=searchInput.value.trim();
+    currentPage=1;
+    renderGallery();
+});
+
+searchInput.addEventListener("input",()=>{
+    searchQuery=searchInput.value.trim();
+    currentPage=1;
+    renderGallery();
+});
+
+
+// =====================================
+// BUKA PLAYER
+// =====================================
+
+function openPlayer(item) {
+
+    cardInner.classList.add("rotate-y-180");
+
+    mainVideoPlayer.src=item.embed;
+    mainVideoPlayer.title=item.title;
+
+    playerVideoTitle.textContent=item.title;
+
+    resetAds();
+    startAdSequence();
+}
+
+
+// =====================================
+// KEMBALI KE GALERI
+// =====================================
+
+document.getElementById("backToGalleryBtn").addEventListener("click",()=>{
+
+    cardInner.classList.remove("rotate-y-180");
+
+    mainVideoPlayer.src="about:blank";
+
+    playerVideoTitle.textContent="Pilih video dari galeri";
+
+    clearAllAdTimeouts();
+    hideAllAds();
+});
+
+
+// =====================================
+// MULAI IKLAN
+// =====================================
+
+function startAdSequence() {
+
+    clearAllAdTimeouts();
+
+    ad1Closed=false;
+    ad2Closed=false;
+    ad3Closed=false;
+
+    ad1Timeout=setTimeout(showAd1,10000);
+    ad3Timeout=setTimeout(showAd3,11000);
+    ad2Timeout=setTimeout(showAd2,11500);
+}
+
+
+// =====================================
+// IKLAN 1
+// =====================================
+
+function showAd1() {
+
+    if(ad1Cycle>=ad1Data.length) return;
+
+    const ad=ad1Data[ad1Cycle];
+
+    document.getElementById("ad1Img").src=ad.img;
+    document.getElementById("ad1Text").textContent=ad.text;
+    document.getElementById("ad1BtnText").textContent=ad.btn;
+
+    document.getElementById("ad1").classList.remove("hidden");
+
+    ad1Closed=false;
+}
+
+
+// =====================================
+// IKLAN 2
+// =====================================
+
+function showAd2() {
+
+    if(ad2Cycle>=ad2Data.length) return;
+
+    const ad=ad2Data[ad2Cycle];
+
+    const video=document.getElementById("ad2Video");
+
+    video.src=ad.video;
+    video.load();
+    video.play().catch(()=>{});
+
+    document.getElementById("ad2Label").textContent=ad.label;
+    document.getElementById("ad2").classList.remove("hidden");
+
+    ad2Closed=false;
+}
+
+
+// =====================================
+// IKLAN 3
+// =====================================
+
+function showAd3() {
+
+    if(ad3Cycle>=ad3Data.length) return;
+
+    const ad=ad3Data[ad3Cycle];
+
+    document.getElementById("ad3Img").src=ad.img;
+    document.getElementById("ad3Label").textContent=ad.label;
+
+    document.getElementById("ad3").classList.remove("hidden");
+
+    ad3Closed=false;
+}
+
+
+// =====================================
+// TUTUP IKLAN
+// =====================================
+
+function closeAd(adId) {
+
+    document.getElementById(adId).classList.add("hidden");
+
+    if(adId==="ad2") {
+        const video=document.getElementById("ad2Video");
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+    }
+
+    if(adId==="ad1") ad1Closed=true;
+    if(adId==="ad2") ad2Closed=true;
+    if(adId==="ad3") ad3Closed=true;
+
+    if(ad1Closed && ad2Closed && ad3Closed) {
+
+        if(ad1Cycle<ad1Data.length-1) {
+
+            clearTimeout(nextSessionTimeout);
+
+            nextSessionTimeout=setTimeout(()=>{
+
+                if(cardInner.classList.contains("rotate-y-180")) {
+
+                    ad1Cycle++;
+                    ad2Cycle++;
+                    ad3Cycle++;
+
+                    startAdSequence();
+                }
+
+            },60000);
+        }
+    }
+}
+
+
+// =====================================
+// RESET IKLAN
+// =====================================
+
+function resetAds() {
+
+    hideAllAds();
+
+    ad1Cycle=0;
+    ad2Cycle=0;
+    ad3Cycle=0;
+
+    ad1Closed=false;
+    ad2Closed=false;
+    ad3Closed=false;
+
+    clearTimeout(nextSessionTimeout);
+}
+
+
+// =====================================
+// SEMBUNYIKAN IKLAN
+// =====================================
+
+function hideAllAds() {
+
+    document.getElementById("ad1").classList.add("hidden");
+    document.getElementById("ad2").classList.add("hidden");
+    document.getElementById("ad3").classList.add("hidden");
+
+    const video=document.getElementById("ad2Video");
+
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+}
+
+
+// =====================================
+// HAPUS TIMER
+// =====================================
+
+function clearAllAdTimeouts() {
+
+    clearTimeout(ad1Timeout);
+    clearTimeout(ad2Timeout);
+    clearTimeout(ad3Timeout);
+    clearTimeout(nextSessionTimeout);
+}
+
+
+// =====================================
+// JALANKAN
+// =====================================
+
+renderGallery();
+
+</script>
 </body>
 </html>
